@@ -13,7 +13,7 @@ void Init_similarity_sorting() {
   rb_define_singleton_method(SimilaritySorting, "sort", method_similarity_sorting_sort, 3);
 }
 
-void sort_block(VALUE array, VALUES scores, long start, long stop) {
+void sort_block(VALUE array, VALUE scores, long start, long stop) {
   for(i = start + 1; i < stop; i++) {
     VALUE reference = rb_ary_entry(array, i - 1);
     VALUE reference_keywords_array = rb_ary_entry(reference, 2);
