@@ -14,6 +14,8 @@ void Init_similarity_sorting() {
 }
 
 void sort_block(VALUE array, VALUE scores, long start, long stop) {
+  int i;
+
   for(i = start + 1; i < stop; i++) {
     VALUE reference = rb_ary_entry(array, i - 1);
     VALUE reference_keywords_array = rb_ary_entry(reference, 2);
@@ -22,7 +24,7 @@ void sort_block(VALUE array, VALUE scores, long start, long stop) {
     double max_value = -1;
     long u;
 
-    for(u = i; u < m; u++) {
+    for(u = i; u < stop; u++) {
       VALUE current = rb_ary_entry(array, u);
       VALUE current_keywords_hash = rb_ary_entry(current, 1);
       long keywords_count = RARRAY_LEN(reference_keywords_array);
