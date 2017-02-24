@@ -5,18 +5,21 @@
 
 VALUE SimilaritySorting = Qnil;
 
-VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALUE lookahead);
+VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALUE start, VALUE stop);
 
 void Init_similarity_sorting() {
   SimilaritySorting = rb_define_module("SimilaritySorting");
 
-  rb_define_singleton_method(SimilaritySorting, "sort", method_similarity_sorting_sort, 3);
+  rb_define_singleton_method(SimilaritySorting, "sort", method_similarity_sorting_sort, 4);
 }
 
-void sort_block(VALUE array, VALUE scores, long start, long stop) {
-  int i;
+VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALUE start, VALUE stop) {
+  long len = RARRAY_LEN(array);
+  long start_value = NUM2LONG(start);
+  long stop_value = NUM2LONG(stop);
+  long b, i;
 
-  for(i = start + 1; i < stop; i++) {
+  for(i = start_value + 1; i < stop_value; i++) {
     VALUE reference = rb_ary_entry(array, i - 1);
     VALUE reference_keywords_array = rb_ary_entry(reference, 2);
 
@@ -24,7 +27,7 @@ void sort_block(VALUE array, VALUE scores, long start, long stop) {
     double max_value = -1;
     long u;
 
-    for(u = i; u < stop; u++) {
+    for(u = i; u < stop_value; u++) {
       VALUE current = rb_ary_entry(array, u);
       VALUE current_keywords_hash = rb_ary_entry(current, 1);
       long keywords_count = RARRAY_LEN(reference_keywords_array);
@@ -48,19 +51,7 @@ void sort_block(VALUE array, VALUE scores, long start, long stop) {
     rb_ary_store(array, i, rb_ary_entry(array, max_index));
     rb_ary_store(array, max_index, old);
   }
-}
 
-VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALUE lookahead) {
-  long len = RARRAY_LEN(array);
-  long lookahead_value = NUM2LONG(lookahead);
-  long b;
-
-  for(b = 0; b < len; b += lookahead_value)
-    sort_block(array, scores, b, MIN(len, b + lookahead_value));
-
-  for(b = lookahead_value / 2; b < len; b += lookahead_value)
-    sort_block(array, scores, b, MIN(len, b + lookahead_value));
-
-  return array;
+  return Qnil;
 }
 
