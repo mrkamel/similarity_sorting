@@ -19,7 +19,7 @@ VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALU
   long stop_value = NUM2LONG(stop);
   long b, i;
 
-  for(i = start_value + 1; i < stop_value; i++) {
+  for(i = start_value + 1; i <= stop_value; i++) {
     VALUE reference = rb_ary_entry(array, i - 1);
     VALUE reference_keywords_array = rb_ary_entry(reference, 2);
 
@@ -27,7 +27,7 @@ VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALU
     double max_value = -1;
     long u;
 
-    for(u = i; u < stop_value; u++) {
+    for(u = i; u <= stop_value; u++) {
       VALUE current = rb_ary_entry(array, u);
       VALUE current_keywords_hash = rb_ary_entry(current, 1);
       long keywords_count = RARRAY_LEN(reference_keywords_array);
