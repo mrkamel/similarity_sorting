@@ -26,21 +26,21 @@ VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALU
       VALUE reference_keywords_array = rb_ary_entry(reference, 2);
 
       long max_index = i;
-      long max_value = -1;
+      double max_value = -1;
       long u;
 
       for(u = i; u < m; u++) {
         VALUE current = rb_ary_entry(array, u);
         VALUE current_keywords_hash = rb_ary_entry(current, 1);
         long keywords_count = RARRAY_LEN(reference_keywords_array);
-        long value = 0;
+        double value = 0;
         long k;
 
         for(k = 0; k < keywords_count; k++) {
           VALUE keyword = rb_ary_entry(reference_keywords_array, k);
 
           if(RTEST(rb_hash_aref(current_keywords_hash, keyword)))
-            value += NUM2LONG(rb_hash_aref(scores, keyword));
+            value += NUM2DBL(rb_hash_aref(scores, keyword));
         }
 
         if(value > max_value) {
