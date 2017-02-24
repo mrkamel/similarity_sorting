@@ -40,7 +40,7 @@ VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALU
           VALUE keyword = rb_ary_entry(reference_keywords_array, k);
 
           if(RTEST(rb_hash_aref(current_keywords_hash, keyword)))
-            value += NUM2DBL(rb_hash_aref(scores, keyword));
+            value += NUM2DBL(rb_ary_entry(scores, NUM2LONG(keyword)));
         }
 
         if(value > max_value) {
