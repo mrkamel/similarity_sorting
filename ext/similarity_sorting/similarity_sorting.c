@@ -39,8 +39,8 @@ VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALU
         for(k = 0; k < keywords_count; k++) {
           VALUE keyword = rb_ary_entry(reference_keywords_array, k);
 
-          if(RTEST(rb_hash_aref(current_keywords_hash, keyword)))
-            value += NUM2DBL(rb_hash_aref(scores, keyword));
+          if(rb_hash_lookup(current_keywords_hash, keyword) == Qtrue)
+            value += NUM2DBL(rb_ary_entry(scores, NUM2LONG(keyword)));
         }
 
         if(value > max_value) {
