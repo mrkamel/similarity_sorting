@@ -5,53 +5,56 @@
 
 VALUE SimilaritySorting = Qnil;
 
-VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALUE start, VALUE stop);
+VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALUE lookahead);
 
 void Init_similarity_sorting() {
   SimilaritySorting = rb_define_module("SimilaritySorting");
 
-  rb_define_singleton_method(SimilaritySorting, "sort", method_similarity_sorting_sort, 4);
+  rb_define_singleton_method(SimilaritySorting, "sort", method_similarity_sorting_sort, 3);
 }
 
-VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALUE start, VALUE stop) {
+VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALUE lookahead) {
   long len = RARRAY_LEN(array);
-  long start_value = NUM2LONG(start);
-  long stop_value = NUM2LONG(stop);
-  long b, i;
+  long lookahead_value = NUM2LONG(lookahead);
+  long b;
 
-  for(i = start_value + 1; i <= stop_value; i++) {
-    VALUE reference = rb_ary_entry(array, i - 1);
-    VALUE reference_keywords_array = rb_ary_entry(reference, 2);
+  for(b = 0; b < len; b += lookahead_value) {
+    long i, m = MIN(len, b + lookahead_value);
 
-    long max_index = i;
-    double max_value = -1;
-    long u;
+    for(i = b + 1; i < m; i++) {
+      VALUE reference = rb_ary_entry(array, i - 1);
+      VALUE reference_keywords_array = rb_ary_entry(reference, 2);
 
-    for(u = i; u <= stop_value; u++) {
-      VALUE current = rb_ary_entry(array, u);
-      VALUE current_keywords_hash = rb_ary_entry(current, 1);
-      long keywords_count = RARRAY_LEN(reference_keywords_array);
-      double value = 0;
-      long k;
+      long max_index = i;
+      double max_value = -1;
+      long u;
 
-      for(k = 0; k < keywords_count; k++) {
-        VALUE keyword = rb_ary_entry(reference_keywords_array, k);
+      for(u = i; u < m; u++) {
+        VALUE current = rb_ary_entry(array, u);
+        VALUE current_keywords_hash = rb_ary_entry(current, 1);
+        long keywords_count = RARRAY_LEN(reference_keywords_array);
+        double value = 0;
+        long k;
 
-        if(rb_hash_lookup(current_keywords_hash, keyword) == Qtrue)
-          value += NUM2DBL(rb_ary_entry(scores, NUM2LONG(keyword)));
+        for(k = 0; k < keywords_count; k++) {
+          VALUE keyword = rb_ary_entry(reference_keywords_array, k);
+
+          if(RTEST(rb_hash_aref(current_keywords_hash, keyword)))
+            value += NUM2DBL(rb_hash_aref(scores, keyword));
+        }
+
+        if(value > max_value) {
+          max_index = u;
+          max_value = value;
+        }
       }
 
-      if(value > max_value) {
-        max_index = u;
-        max_value = value;
-      }
+      VALUE old = rb_ary_entry(array, i);
+      rb_ary_store(array, i, rb_ary_entry(array, max_index));
+      rb_ary_store(array, max_index, old);
     }
-
-    VALUE old = rb_ary_entry(array, i);
-    rb_ary_store(array, i, rb_ary_entry(array, max_index));
-    rb_ary_store(array, max_index, old);
   }
 
-  return Qnil;
+  return array;
 }
 
