@@ -54,10 +54,10 @@ VALUE method_similarity_sorting_sort(VALUE self, VALUE array, VALUE scores, VALU
   long b;
 
   for(b = 0; b < len; b += lookahead_value)
-    sort_block(array, scores, b, MIN(len, b + lookahead_value);
+    sort_block(array, scores, b, MIN(len, b + lookahead_value));
 
   for(b = lookahead_value / 2; b < len; b += lookahead_value)
-    sort_block(array, scores, b, MIN(len, b + lookahead_value);
+    sort_block(array, scores, b, MIN(len, b + lookahead_value));
 
   return array;
 }
